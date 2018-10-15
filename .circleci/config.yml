@@ -21,7 +21,10 @@ jobs:
             cd jsnark/JsnarkCircuitBuilder
             mkdir -p bin
             javac -d bin -cp /usr/share/java/junit4.jar:bcprov-jdk15on-159.jar  $(find ./src/* | grep ".java$")
-
+      - persist_to_workspace:
+          root: .
+          paths:
+            - bin
   build_ethsnarks:
     docker:
       - image: appliedblockchain/libsnark-env
@@ -43,11 +46,14 @@ jobs:
           command: |
             cd ethsnarks/build
             make
-  say_hello:
+
+  simple_example_jsnark:
     docker:
       - image: circleci/openjdk:8-jdk-browsers
     steps:
-      - run: echo Hello
+      - attach_workspace:
+          at: .
+      - run: ls
 
 workflows:
   version: 2
@@ -55,7 +61,7 @@ workflows:
     jobs:
       - build_jsnark
       - build_ethsnarks
-      - say_hello:
+      - simple_example_jsnark:
           requires:
             - build_jsnark
             - build_ethsnarks
