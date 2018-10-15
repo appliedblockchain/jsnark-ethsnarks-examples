@@ -7,8 +7,7 @@ jobs:
       - checkout
       - run:
           name: Get jsnark
-          command: |
-            git submodule update --init --recursive jsnark
+          command: git submodule update --init --recursive jsnark
       - run:
           name: Install JsnarkCircuitBuilder dependencies
           command: |
@@ -32,8 +31,7 @@ jobs:
       - checkout
       - run:
           name: Get ethsnarks
-          command: |
-            git submodule update --init --recursive ethsnarks
+          command: git submodule update --init --recursive ethsnarks
       - run:
           name: CMake
           command: |
@@ -53,7 +51,9 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - run: ls
+      - run:
+          name: Run Java program
+          command: java -cp bin examples.generators.SimpleCircuitGenerator
 
 workflows:
   version: 2
