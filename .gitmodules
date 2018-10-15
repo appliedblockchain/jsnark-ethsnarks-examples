@@ -1,0 +1,6 @@
+[submodule "jsnark"]
+	path = jsnark
+	url = https://github.com/akosba/jsnark.git
+[submodule "ethsnarks"]
+	path = ethsnarks
+	url = https://github.com/HarryR/ethsnarks.git
