@@ -21,10 +21,10 @@ jobs:
             mkdir -p bin
             javac -d bin -cp /usr/share/java/junit4.jar:bcprov-jdk15on-159.jar  $(find ./src/* | grep ".java$")
       - persist_to_workspace:
-          root: jsnark/JsnarkCircuitBuilder
+          root: .
           paths:
-            - bin
-            - config.properties
+            - jsnark/JsnarkCircuitBuilder/bin
+            - jsnark/JsnarkCircuitBuilder/config.properties
 
   build_jsnark_libsnark:
     docker:
@@ -45,9 +45,9 @@ jobs:
             cd jsnark/libsnark
             make
       - persist_to_workspace:
-          root: jsnark
+          root: .
           paths:
-            - libsnark
+            - jsnark/libsnark
 
   build_ethsnarks:
     docker:
@@ -78,7 +78,9 @@ jobs:
           at: .
       - run:
           name: Run Java program
-          command: java -cp bin examples.generators.SimpleCircuitGenerator
+          command: |
+            cd jsnark/JsnarkCircuitBuilder
+            java -cp bin examples.generators.SimpleCircuitGenerator
 
 workflows:
   version: 2
