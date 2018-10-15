@@ -1,23 +1,61 @@
 version: 2
 jobs:
-  build:
+  build_jsnark:
     docker:
       - image: circleci/openjdk:8-jdk-browsers
     steps:
       - checkout
       - run:
-          name: "Get jsnark"
+          name: Get jsnark
           command: |
             git submodule update --init --recursive jsnark
       - run:
-          name: "Install JsnarkCircuitBuilder dependencies"
+          name: Install JsnarkCircuitBuilder dependencies
           command: |
             sudo apt-get install junit4
             cd jsnark/JsnarkCircuitBuilder
             wget https://www.bouncycastle.org/download/bcprov-jdk15on-159.jar
       - run:
-          name: "Build JsnarkCircuitBuilder"
+          name: Build JsnarkCircuitBuilder
           command: |
             cd jsnark/JsnarkCircuitBuilder
             mkdir -p bin
             javac -d bin -cp /usr/share/java/junit4.jar:bcprov-jdk15on-159.jar  $(find ./src/* | grep ".java$")
+
+  build_ethsnarks:
+    docker:
+      - image: appliedblockchain/libsnark-env
+    steps:
+      - checkout
+      - run:
+          name: Get ethsnarks
+          command: |
+            git submodule update --init --recursive ethsnarks
+      - run:
+          name: CMake
+          command: |
+            cd ethsnarks
+            mkdir build
+            cd build
+            cmake ..
+      - run:
+          name: make
+          command: |
+            cd ethsnarks/build
+            make
+  say_hello:
+    docker:
+      - image: circleci/openjdk:8-jdk-browsers
+    steps:
+      - run: echo Hello
+
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build_jsnark
+      - build_ethsnarks
+      - say_hello:
+          requires:
+            - build_jsnark
+            - build_ethsnarks
