@@ -9,3 +9,15 @@ jobs:
           name: "Get jsnark"
           command: |
             git submodule update --init --recursive jsnark
+      - run:
+          name: "Install JsnarkCircuitBuilder dependencies"
+          command: |
+            sudo apt-get install junit4
+            cd jsnark/JsnarkCircuitBuilder
+            wget https://www.bouncycastle.org/download/bcprov-jdk15on-159.jar
+      - run:
+          name: "Build JsnarkCircuitBuilder"
+          command: |
+            cd jsnark/JsnarkCircuitBuilder
+            mkdir -p bin
+            javac -d bin -cp /usr/share/java/junit4.jar:bcprov-jdk15on-159.jar  $(find ./src/* | grep ".java$")
