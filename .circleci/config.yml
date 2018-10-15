@@ -24,6 +24,7 @@ jobs:
           root: jsnark/JsnarkCircuitBuilder
           paths:
             - bin
+            - config.properties
   build_ethsnarks:
     docker:
       - image: appliedblockchain/libsnark-env
