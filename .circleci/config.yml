@@ -8,4 +8,4 @@ jobs:
       - run:
           name: "Get jsnark"
           command: |
-            git submodule update jsnark --init --recursive
+            git submodule jsnark --init --recursive jsnark
