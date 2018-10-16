@@ -5,6 +5,11 @@ const path = require('path')
 const Web3 = require('web3')
 const sendTransaction = require('./send-transaction')
 
+process.on('unhandledRejection', error => {
+  console.log(error.message)
+  process.exit(1)
+})
+
 async function run() {
   if (process.argv.length !== 4) {
     console.log('Need exactly 2 arguments (path to vk, path to proof)')
