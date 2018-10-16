@@ -115,7 +115,7 @@ jobs:
           at: .
       - run:
           name: "ethsnarks: verify"
-          command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/simple_example.arith verify vk.json proof.json
+          command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/simple_example.arith verify $PWD/vk.json $PWD/proof.json
 
   simple_example_verify_ethereum:
     docker:
