@@ -6,10 +6,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Get jsnark
+          name: "Get jsnark"
           command: git submodule update --init --recursive jsnark
       - run:
-          name: Build JsnarkCircuitBuilder
+          name: "Build JsnarkCircuitBuilder"
           command: |
             cd jsnark/JsnarkCircuitBuilder
             mkdir -p bin
@@ -26,15 +26,15 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Get jsnark
+          name: "Get jsnark"
           command: git submodule update --init --recursive jsnark
       - run:
-          name: Prepare depends
+          name: "Prepare depends"
           command: |
             cd jsnark/libsnark
             ./prepare-depends.sh
       - run:
-          name: make
+          name: "make"
           command: |
             cd jsnark/libsnark
             make
@@ -49,17 +49,17 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Get ethsnarks
+          name: "Get ethsnarks"
           command: git submodule update --init --recursive ethsnarks
       - run:
-          name: CMake
+          name: "CMake"
           command: |
             cd ethsnarks
             mkdir build
             cd build
             cmake ..
       - run:
-          name: make
+          name: "make"
           command: |
             cd ethsnarks/build
             make pinocchio
@@ -75,15 +75,15 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: jsnark
+          name: "jsnark"
           command: |
             cd jsnark/JsnarkCircuitBuilder
             java -cp bin examples.generators.SimpleCircuitGenerator
       - run:
-          name: ethsnarks: genkeys
+          name: "ethsnarks: genkeys"
           command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/simple_example.arith genkeys pk.raw vk.json
       - run:
-          name: ethsnarks: prove
+          name: "ethsnarks: prove"
           command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/simple_example.arith prove jsnark/JsnarkCircuitBuilder/simple_example.in pk.raw proof.json
       - persist_to_workspace:
           root: .
@@ -99,7 +99,7 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: ethsnarks: verify
+          name: "ethsnarks: verify"
           command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/simple_example.arith verify vk.json proof.json
 
 workflows:
