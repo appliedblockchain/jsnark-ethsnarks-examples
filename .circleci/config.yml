@@ -116,7 +116,6 @@ jobs:
       - run:
           name: "ethsnarks: verify"
           command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/simple_example.arith verify vk.json proof.json
-
   simple_verify_ethereum:
     docker:
       - image: appliedblockchain/jsnark-env
@@ -129,6 +128,51 @@ jobs:
           name: "Verify on Ethereum"
           command: node ethereum/js/run.js $PWD/vk.json $PWD/proof.json
 
+  sha_256_prove:
+    docker:
+      - image: appliedblockchain/jsnark-env
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: "jsnark"
+          command: |
+            cd jsnark/JsnarkCircuitBuilder
+            java -cp bin examples.generators.hash.SHA2CircuitGenerator
+      - run:
+          name: "ethsnarks: genkeys"
+          command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/sha_256.arith genkeys sha_256_pk.raw sha_256_vk.json
+      - run:
+          name: "ethsnarks: prove"
+          command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/sha_256.arith prove jsnark/JsnarkCircuitBuilder/sha_256.in sha_256_pk.raw sha_256_proof.json
+      - persist_to_workspace:
+          root: .
+          paths:
+            - jsnark/JsnarkCircuitBuilder/sha_256.arith
+            - sha_256_vk.json
+            - sha_256_proof.json
+
+  sha_256_verify_ethsnarks:
+    docker:
+      - image: appliedblockchain/jsnark-env
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: "ethsnarks: verify"
+          command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/sha_256_example.arith verify sha_256_vk.json sha_256_proof.json
+
+  sha_256_verify_ethereum:
+    docker:
+      - image: appliedblockchain/jsnark-env
+      - image: parity/parity:stable
+        command: --config dev --jsonrpc-interface all --gasprice 0
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Verify on Ethereum"
+          command: node ethereum/js/run.js $PWD/sha_256_vk.json $PWD/sha_256_proof.json
 
 workflows:
   version: 2
@@ -150,3 +194,15 @@ workflows:
           requires:
             - install_js_deps
             - simple_prove
+      - sha_256_prove:
+          requires:
+            - bld_jsnark_circuit_builder
+            - bld_jsnark_libsnark
+            - bld_ethsnarks
+      - sha_256_verify_ethsnarks:
+          requires:
+            - sha_256_prove
+      - sha_256_verify_ethereum:
+          requires:
+            - install_js_deps
+            - sha_256_prove
