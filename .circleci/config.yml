@@ -68,6 +68,21 @@ jobs:
           paths:
             - ethsnarks/bin
 
+  build_jsnark_circuit_builder:
+    docker:
+      - image: appliedblockchain/jsnark-env
+    steps:
+      - checkout
+      - run:
+          name: "npm install"
+          command: |
+            cd ethereum/js
+            npm i
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ethereum
+
   simple_example_prove:
     docker:
       - image: appliedblockchain/jsnark-env
@@ -92,7 +107,7 @@ jobs:
             - vk.json
             - proof.json
 
-  simple_example_verify:
+  simple_example_verify_ethsnarks:
     docker:
       - image: appliedblockchain/jsnark-env
     steps:
@@ -102,6 +117,19 @@ jobs:
           name: "ethsnarks: verify"
           command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/simple_example.arith verify vk.json proof.json
 
+  simple_example_verify_ethereum:
+    docker:
+      - image: appliedblockchain/jsnark-env
+      - image: parity/parity:stable
+        command: --config dev --jsonrpc-interface all --gasprice 0
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Verify on Ethereum"
+          command: node ethereum/js/run.js vk.json proof.json
+
+
 workflows:
   version: 2
   main:
@@ -109,11 +137,16 @@ workflows:
       - build_jsnark_circuit_builder
       - build_jsnark_libsnark
       - build_ethsnarks
+      - build_js
       - simple_example_prove:
           requires:
             - build_jsnark_circuit_builder
             - build_jsnark_libsnark
             - build_ethsnarks
-      - simple_example_verify:
+      - simple_example_verify_ethsnarks:
           requires:
+            - simple_example_prove
+      - simple_example_verify_ethereum:
+          requires:
+            - build_js
             - simple_example_prove
