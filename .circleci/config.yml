@@ -68,7 +68,7 @@ jobs:
           paths:
             - ethsnarks/bin
 
-  build_jsnark_circuit_builder:
+  install_js_dependencies:
     docker:
       - image: appliedblockchain/jsnark-env
     steps:
@@ -137,7 +137,7 @@ workflows:
       - build_jsnark_circuit_builder
       - build_jsnark_libsnark
       - build_ethsnarks
-      - build_js
+      - install_js_dependencies
       - simple_example_prove:
           requires:
             - build_jsnark_circuit_builder
@@ -148,5 +148,5 @@ workflows:
             - simple_example_prove
       - simple_example_verify_ethereum:
           requires:
-            - build_js
+            - install_js_dependencies
             - simple_example_prove
