@@ -63,6 +63,11 @@ jobs:
           command: |
             cd ethsnarks/build
             make
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ethsnarks/bin
+
 
   simple_example_jsnark:
     docker:
@@ -71,7 +76,7 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Run Java program
+          name: Jsnark
           command: |
             cd jsnark/JsnarkCircuitBuilder
             java -cp bin examples.generators.SimpleCircuitGenerator
