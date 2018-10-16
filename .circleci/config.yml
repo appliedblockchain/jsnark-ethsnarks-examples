@@ -13,7 +13,7 @@ jobs:
           command: |
             cd jsnark/JsnarkCircuitBuilder
             mkdir -p bin
-            javac -d bin -cp /usr/share/java/junit4.jar:bcprov-jdk15on-159.jar  $(find ./src/* | grep ".java$")
+            javac -d bin -cp /usr/share/java/junit4.jar:/bcprov-jdk15on-159.jar  $(find ./src/* | grep ".java$")
       - persist_to_workspace:
           root: .
           paths:
