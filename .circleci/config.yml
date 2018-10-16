@@ -2,18 +2,12 @@ version: 2
 jobs:
   build_jsnark_circuit_builder:
     docker:
-      - image: circleci/openjdk:8-jdk-browsers
+      - image: appliedblockchain/jsnark-env
     steps:
       - checkout
       - run:
           name: Get jsnark
           command: git submodule update --init --recursive jsnark
-      - run:
-          name: Install JsnarkCircuitBuilder dependencies
-          command: |
-            sudo apt-get install junit4
-            cd jsnark/JsnarkCircuitBuilder
-            wget https://www.bouncycastle.org/download/bcprov-jdk15on-159.jar
       - run:
           name: Build JsnarkCircuitBuilder
           command: |
@@ -28,7 +22,7 @@ jobs:
 
   build_jsnark_libsnark:
     docker:
-      - image: appliedblockchain/libsnark-env
+      - image: appliedblockchain/jsnark-env
     steps:
       - checkout
       - run:
@@ -51,7 +45,7 @@ jobs:
 
   build_ethsnarks:
     docker:
-      - image: appliedblockchain/libsnark-env
+      - image: appliedblockchain/jsnark-env
     steps:
       - checkout
       - run:
@@ -72,7 +66,7 @@ jobs:
 
   simple_example_jsnark:
     docker:
-      - image: circleci/openjdk:8-jdk-browsers
+      - image: appliedblockchain/jsnark-env
     steps:
       - attach_workspace:
           at: .
