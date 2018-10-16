@@ -62,24 +62,45 @@ jobs:
           name: make
           command: |
             cd ethsnarks/build
-            make
+            make pinocchio
       - persist_to_workspace:
           root: .
           paths:
             - ethsnarks/bin
 
-
-  simple_example_jsnark:
+  simple_example_prove:
     docker:
       - image: appliedblockchain/jsnark-env
     steps:
       - attach_workspace:
           at: .
       - run:
-          name: Jsnark
+          name: jsnark
           command: |
             cd jsnark/JsnarkCircuitBuilder
             java -cp bin examples.generators.SimpleCircuitGenerator
+      - run:
+          name: ethsnarks: genkeys
+          command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/simple_example.arith genkeys pk.raw vk.json
+      - run:
+          name: ethsnarks: prove
+          command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/simple_example.arith prove jsnark/JsnarkCircuitBuilder/simple_example.in pk.raw proof.json
+      - persist_to_workspace:
+          root: .
+          paths:
+            - jsnark/JsnarkCircuitBuilder/simple_example.arith
+            - vk.json
+            - proof.json
+
+  simple_example_verify:
+    docker:
+      - image: appliedblockchain/jsnark-env
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: ethsnarks: verify
+          command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/simple_example.arith verify vk.json proof.json
 
 workflows:
   version: 2
@@ -88,8 +109,11 @@ workflows:
       - build_jsnark_circuit_builder
       - build_jsnark_libsnark
       - build_ethsnarks
-      - simple_example_jsnark:
+      - simple_example_prove:
           requires:
             - build_jsnark_circuit_builder
             - build_jsnark_libsnark
             - build_ethsnarks
+      - simple_example_verify:
+          requires:
+            - simple_example_prove
