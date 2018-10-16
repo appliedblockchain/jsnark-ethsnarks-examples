@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build_jsnark_circuit_builder:
+  bld_jsnark_circuit_builder:
     docker:
       - image: appliedblockchain/jsnark-env
     steps:
@@ -20,7 +20,7 @@ jobs:
             - jsnark/JsnarkCircuitBuilder/bin
             - jsnark/JsnarkCircuitBuilder/config.properties
 
-  build_jsnark_libsnark:
+  bld_jsnark_libsnark:
     docker:
       - image: appliedblockchain/jsnark-env
     steps:
@@ -43,7 +43,7 @@ jobs:
           paths:
             - jsnark/libsnark
 
-  build_ethsnarks:
+  bld_ethsnarks:
     docker:
       - image: appliedblockchain/jsnark-env
     steps:
@@ -68,7 +68,7 @@ jobs:
           paths:
             - ethsnarks/bin
 
-  install_js_dependencies:
+  install_js_deps:
     docker:
       - image: appliedblockchain/jsnark-env
     steps:
@@ -83,7 +83,7 @@ jobs:
           paths:
             - ethereum
 
-  simple_example_prove:
+  simple_prove:
     docker:
       - image: appliedblockchain/jsnark-env
     steps:
@@ -107,7 +107,7 @@ jobs:
             - vk.json
             - proof.json
 
-  simple_example_verify_ethsnarks:
+  simple_verify_ethsnarks:
     docker:
       - image: appliedblockchain/jsnark-env
     steps:
@@ -115,9 +115,9 @@ jobs:
           at: .
       - run:
           name: "ethsnarks: verify"
-          command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/simple_example.arith verify $PWD/vk.json $PWD/proof.json
+          command: ethsnarks/bin/pinocchio jsnark/JsnarkCircuitBuilder/simple_example.arith verify ${pwd}/vk.json ${pwd}/proof.json
 
-  simple_example_verify_ethereum:
+  simple_verify_ethereum:
     docker:
       - image: appliedblockchain/jsnark-env
       - image: parity/parity:stable
@@ -134,19 +134,19 @@ workflows:
   version: 2
   main:
     jobs:
-      - build_jsnark_circuit_builder
-      - build_jsnark_libsnark
-      - build_ethsnarks
-      - install_js_dependencies
-      - simple_example_prove:
+      - bld_jsnark_circuit_builder
+      - bld_jsnark_libsnark
+      - bld_ethsnarks
+      - install_js_deps
+      - simple_prove:
           requires:
-            - build_jsnark_circuit_builder
-            - build_jsnark_libsnark
-            - build_ethsnarks
-      - simple_example_verify_ethsnarks:
+            - bld_jsnark_circuit_builder
+            - bld_jsnark_libsnark
+            - bld_ethsnarks
+      - simple_verify_ethsnarks:
           requires:
-            - simple_example_prove
-      - simple_example_verify_ethereum:
+            - simple_prove
+      - simple_verify_ethereum:
           requires:
-            - install_js_dependencies
-            - simple_example_prove
+            - install_js_deps
+            - simple_prove
